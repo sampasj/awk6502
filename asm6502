@@ -9,7 +9,40 @@ BEGIN {
 }
 
 function setopcodetbl() {
+    op["BCC"] = 144    # 0x90
+    op["BCS"] = 176    # 0xB0
+    op["BEQ"] = 240    # 0xF0
+    op["BMI"] = 48     # 0x30
+    op["BNE"] = 208    # 0xD0
+    op["BPL"] = 16     # 0x10
+    op["BRK"] = 0      # 0x00
+    op["BVC"] = 80     # 0x50
+    op["BVS"] = 112    # 0x70
+    op["CLC"] = 24     # 0x18
+    op["CLD"] = 216    # 0xD8
+    op["CLI"] = 88     # 0x58
+    op["CLV"] = 184    # 0xB8
+    op["DEX"] = 202    # 0xCA
+    op["DEY"] = 136    # 0x88
+    op["INX"] = 232    # 0xE8
+    op["INY"] = 200    # 0xC8
+    op["JSR"] = 32     # 0x20
     op["NOP"] = 234    # 0xEA
+    op["PHA"] = 72     # 0x48
+    op["PHP"] = 8      # 0x08
+    op["PLA"] = 104    # 0x68
+    op["PLP"] = 40     # 0x28
+    op["RTI"] = 64     # 0x40
+    op["RTS"] = 96     # 0x60
+    op["SEC"] = 56     # 0x38
+    op["SED"] = 248    # 0xF8
+    op["SEI"] = 120    # 0x78
+    op["TAX"] = 170    # 0xAA
+    op["TAY"] = 168    # 0xA8
+    op["TSX"] = 186    # 0xBA
+    op["TXA"] = 138    # 0x8A
+    op["TXS"] = 154    # 0x9A
+    op["TYA"] = 152    # 0x98
 }
 
 function assemblerpass1() {
