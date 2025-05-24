@@ -1,3 +1,6 @@
+# asm6502 - assembler and interpreter for MOS 6502 computer
+#   usage: awk6502 -f asm program-file data-file...
+
 BEGIN {
     srcfile = ARGV[1]
     ARGV[1] = ""  # remaining files are data
@@ -60,9 +63,20 @@ function assemblerpass1() {
 }
 
 function assemblerpass2() {
-    
+        nextmem = 0
+        while (getline <tempfile > 0) {
+            if ($2 !~ /^[0-9]*$/)  # if symbolic addr,
+               $2 = symtab[$2]     # replace by numeric value
+            mem[nextmem++] = op[$1]
+        }
 }
 
 function interpreter() {
-    
+        for (pc = 0; pc >= 0; ) {
+        #addr = mem[pc] % 1000
+        code = mem[pc]
+        if      (code == op["NOP"])   { printf("%04X:%s\n",pc, "NOP"); pc++ }  # advance pc to next instraction
+        #else if (code == op["put"])   { print acc }
+        else                          { pc = -1 }  # halt if invalid
+    }
 }
