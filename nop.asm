@@ -1,3 +1,4 @@
+     .ORG    8000
      NOP
      NOP
      NOP
