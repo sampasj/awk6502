@@ -1,5 +1,5 @@
-     .ORG    0x8000
-     NOP
+     .ORG    $8000
+     NOP     ; No OPeration
      NOP
      NOP
      NOP
