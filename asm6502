@@ -5,6 +5,8 @@ BEGIN {
     srcfile = ARGV[1]
     ARGV[1] = ""  # remaining files are data
     tempfile = "asm6502.temp"
+    statusRegister = 128 * flagN + 64 * flagV + 16 * flagB + 8 * flagD + 4 * flagI + 2 * flagZ + flagC
+    #print "statusRegister=" statusRegister
     setopcodetbl()
     assemblerpass1()
     assemblerpass2()
