@@ -4,6 +4,7 @@
 BEGIN {
     srcfile = ARGV[1]
     ARGV[1] = ""  # remaining files are data
+    TRACE = 1     # 1:trace print registaers 0:not print
     tempfile = "asm6502.temp"
     statusRegister = 128 * flagN + 64 * flagV + 16 * flagB + 8 * flagD + 4 * flagI + 2 * flagZ + flagC
     #print "statusRegister=" statusRegister
@@ -48,6 +49,14 @@ function setopcodetbl() {
     op["TXA"] = 138    # 0x8A
     op["TXS"] = 154    # 0x9A
     op["TYA"] = 152    # 0x98
+    op["ADCabsolute"] = 96    # 0x60
+    op["ADCzeropage"] = 101   # 0x65
+    op["ADCimmediate"] = 105  # 0x69
+    op["ADCabsoluteX"] = 125  # 0x7D
+    op["ADCabsoluteY"] = 121  # 0x79
+    op["ADCindirectX"] = 97   # 0x61
+    op["ADCindirectY"] = 113  # 0x71
+    op["ADCzeropageX"] = 117   # 0x75
 }
 
 function assemblerpass1() {
@@ -78,8 +87,20 @@ function interpreter() {
         for (pc = org; pc >= 0; ) {
         #addr = mem[pc] % 1000
         code = mem[pc]
-        if      (code == op["NOP"])   { printf("%04X:%s\n",pc, "NOP"); pc++ }  # advance pc to next instraction
+        if      (code == op["NOP"])   { printf("%04X:%s\n",pc, "NOP"); pc++ 
+                                        if (TRACE == 1) traceprint("NOP") 
+                                      }  # advance pc to next instraction
         #else if (code == op["put"])   { print acc }
+        else if (code == op["ADCabsolute"]) { absaddr = mem[pc + 1] + mem[pc + 2] * 256
+                                              acc = acc + mem[absaddr] + flagC
+                                              acc %= 256
+                                              pc += 3
+                                              if (TRACE == 1) traceprint("ADCabsolute") 
+                                            }
         else                          { pc = -1 }  # halt if invalid
     }
+}
+
+function traceprint(mnemonic) {
+    print "pc=", pc, "mnemonic=", mnemonic, " acc=", acc
 }
