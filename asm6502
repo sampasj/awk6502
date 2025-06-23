@@ -4,7 +4,7 @@
 BEGIN {
     srcfile = ARGV[1]
     ARGV[1] = ""  # remaining files are data
-    TRACE = 1     # 1:trace print registaers 0:not print
+    TRACE = 1     # 1:trace print registers 0:not print
     tempfile = "asm6502.temp"
     flagB = flagI = 1
     setStatusRegister()
