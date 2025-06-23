@@ -6,8 +6,8 @@ BEGIN {
     ARGV[1] = ""  # remaining files are data
     TRACE = 1     # 1:trace print registaers 0:not print
     tempfile = "asm6502.temp"
-    statusRegister = 128 * flagN + 64 * flagV + 16 * flagB + 8 * flagD + 4 * flagI + 2 * flagZ + flagC
-    #print "statusRegister=" statusRegister
+    flagB = flagI = 1
+    setStatusRegister()
     setopcodetbl()
     assemblerpass1()
     assemblerpass2()
@@ -94,12 +94,22 @@ function interpreter() {
         else if (code == op["ADCabsolute"]) { if (TRACE == 1) traceprint("ADCabsolute") 
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = acc + mem[absaddr] + flagC
+                                              if ( acc >= 256 ) flagC = flagV = 1
+                                              if ( acc = 256 ) flagZ = 1    # acc=1 0000 0000
                                               acc %= 256
+                                              if ( acc >= 128 ) flagN = 1   # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
                                               pc += 3
+                                            }
         else                          { pc = -1 }  # halt if invalid
     }
 }
 
 function traceprint(mnemonic) {
     printf ( "pc=%X mnemonic=%s opcode=%X acc=%X\n", pc, mnemonic, code, acc)
+}
+
+function setStatusRegister (){
+    statusRegister = 128 * flagN + 64 * flagV + 32 + 16 * flagB + 8 * flagD + 4 * flagI + 2 * flagZ + flagC
+    if (TRACE == 1) printf ("statusRegister=%X\n", statusRegister )
 }
