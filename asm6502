@@ -87,20 +87,19 @@ function interpreter() {
         for (pc = org; pc >= 0; ) {
         #addr = mem[pc] % 1000
         code = mem[pc]
-        if      (code == op["NOP"])   { printf("%04X:%s\n",pc, "NOP"); pc++ 
-                                        if (TRACE == 1) traceprint("NOP") 
+        if      (code == op["NOP"])   { if (TRACE == 1) traceprint("NOP")
+                                        pc++
                                       }  # advance pc to next instraction
         #else if (code == op["put"])   { print acc }
-        else if (code == op["ADCabsolute"]) { absaddr = mem[pc + 1] + mem[pc + 2] * 256
+        else if (code == op["ADCabsolute"]) { if (TRACE == 1) traceprint("ADCabsolute") 
+                                              absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = acc + mem[absaddr] + flagC
                                               acc %= 256
                                               pc += 3
-                                              if (TRACE == 1) traceprint("ADCabsolute") 
-                                            }
         else                          { pc = -1 }  # halt if invalid
     }
 }
 
 function traceprint(mnemonic) {
-    print "pc=", pc, "mnemonic=", mnemonic, " acc=", acc
+    printf ( "pc=%X mnemonic=%s opcode=%X acc=%X\n", pc, mnemonic, code, acc)
 }
