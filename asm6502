@@ -9,6 +9,7 @@ BEGIN {
     flagB = flagI = 1
     setStatusRegister()
     setopcodetbl()
+    setaddressingmodetbl()
     assemblerpass1()
     assemblerpass2()
     interpreter()
@@ -66,9 +67,10 @@ function assemblerpass1() {
         sub(/;.*/, "")         # strip comments
         if ($2 == ".ORG") { sub(/\$/, "0x", $3); nextmem = org = strtonum($3) ; continue }
         symtab[$1] = nextmem   # remember label location
-        if ($2 != "") {        # save op, addr if present
-           print $2 "\t" $3 >tempfile
-           nextmem++
+        if ($2 != "") {        # save op, addr, bytes if present
+           mode = addrmode($2, $3)
+           print $2 "\t" $3 "\t" mode >tempfile
+           nextmem += usebytes[mode]
         }
     }
     close(tempfile)
@@ -79,7 +81,8 @@ function assemblerpass2() {
         while (getline <tempfile > 0) {
             if ($2 !~ /^[0-9]*$/)  # if symbolic addr,
                $2 = symtab[$2]     # replace by numeric value
-            mem[nextmem++] = op[$1]
+            mem[nextmem] = op[$1]
+            nextmem++
         }
 }
 
@@ -112,4 +115,14 @@ function traceprint(mnemonic) {
 function setStatusRegister (){
     statusRegister = 128 * flagN + 64 * flagV + 32 + 16 * flagB + 8 * flagD + 4 * flagI + 2 * flagZ + flagC
     if (TRACE == 1) printf ("statusRegister=%X\n", statusRegister )
+}
+
+function setaddressingmodetbl () {
+    usebyte["implied"] = 1
+    usebyte["absolute"] = 3
+}
+
+function addrmode(op, addr) {
+    if (op == "NOP") return "inplied"
+    else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
