@@ -57,7 +57,7 @@ function setopcodetbl() {
     op["ADCabsoluteY"] = 121  # 0x79
     op["ADCindirectX"] = 97   # 0x61
     op["ADCindirectY"] = 113  # 0x71
-    op["ADCzeropageX"] = 117   # 0x75
+    op["ADCzeropageX"] = 117  # 0x75
 }
 
 function assemblerpass1() {
