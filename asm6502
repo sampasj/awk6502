@@ -1,5 +1,5 @@
 # asm6502 - assembler and interpreter for MOS 6502 computer
-#   usage: awk6502 -f asm program-file data-file...
+#   usage: awk -f asm6502 program-file data-file...
 
 BEGIN {
     srcfile = ARGV[1]
@@ -34,7 +34,7 @@ function setopcodetbl() {
     op["INX"] = 232    # 0xE8
     op["INY"] = 200    # 0xC8
     op["JSR"] = 32     # 0x20
-    op["NOP"] = 234    # 0xEA
+    op["NOPimplied"] = 234    # 0xEA
     op["PHA"] = 72     # 0x48
     op["PHP"] = 8      # 0x08
     op["PLA"] = 104    # 0x68
@@ -81,8 +81,8 @@ function assemblerpass2() {
         while (getline <tempfile > 0) {
             if ($2 !~ /^[0-9]*$/)  # if symbolic addr,
                $2 = symtab[$2]     # replace by numeric value
-            mem[nextmem] = op[$1]
-            nextmem++
+            mem[nextmem] = op[$1 $3]
+            nextmem += usebyte[$3]
         }
 }
 
