@@ -118,8 +118,19 @@ function setStatusRegister (){
 }
 
 function setaddressingmodetbl () {
-    usebyte["implied"] = 1
+    usebyte["accumulator"] = 1
+    usebyte["immediate"] = 2
     usebyte["absolute"] = 3
+    usebyte["zeropage"] = 2
+    usebyte["implied"] = 1
+    usebyte["relative"] = 2
+    usebyte["absoluteX"] = 3
+    usebyte["absoluteY"] = 3
+    usebyte["zeropageX"] = 2
+    usebyte["zeropageY"] = 2
+    usebyte["indiect"] = 3
+    usebyte["indexedX"] = 2     # Indexed Indirect, X
+    usebyte["indirectY"] = 2    # Indirect Indexed, Y
 }
 
 function addrmode(op, addr) {
