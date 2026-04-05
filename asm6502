@@ -90,7 +90,7 @@ function interpreter() {
         for (pc = org; pc >= 0; ) {
         #addr = mem[pc] % 1000
         code = mem[pc]
-        if      (code == op["NOP"])   { if (TRACE == 1) traceprint("NOP")
+        if      (code == op["NOPimplied"])   { if (TRACE == 1) traceprint("NOP")
                                         pc++
                                       }  # advance pc to next instraction
         #else if (code == op["put"])   { print acc }
@@ -134,6 +134,6 @@ function setaddressingmodetbl () {
 }
 
 function addrmode(op, addr) {
-    if (op == "NOP") return "inplied"
+    if (op == "NOP") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
