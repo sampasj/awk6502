@@ -145,6 +145,7 @@ function setaddressingmodetbl () {
 }
 
 function addrmode(op, addr) {
-    if (op == "NOP" || op == "BRK") return "implied"
+    if (op == "NOP" || 
+        op == "BRK") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
