@@ -2,7 +2,7 @@
      NOP     ; No OPeration
      NOP
      ADC $8000
-     NOP
+     BRK
      NOP
      NOP
      NOP
