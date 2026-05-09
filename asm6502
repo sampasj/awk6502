@@ -22,7 +22,7 @@ function setopcodetbl() {
     op["BMI"] = 48     # 0x30
     op["BNE"] = 208    # 0xD0
     op["BPL"] = 16     # 0x10
-    op["BRK"] = 0      # 0x00
+    op["BRKimplied"] = 0      # 0x00
     op["BVC"] = 80     # 0x50
     op["BVS"] = 112    # 0x70
     op["CLC"] = 24     # 0x18
@@ -50,7 +50,7 @@ function setopcodetbl() {
     op["TXA"] = 138    # 0x8A
     op["TXS"] = 154    # 0x9A
     op["TYA"] = 152    # 0x98
-    op["ADCabsolute"] = 96    # 0x60
+    op["ADCabsolute"] = 109   # 0x6D
     op["ADCzeropage"] = 101   # 0x65
     op["ADCimmediate"] = 105  # 0x69
     op["ADCabsoluteX"] = 125  # 0x7D
@@ -101,8 +101,8 @@ function interpreter() {
         #addr = mem[pc] % 1000
         code = mem[pc]
         if      (code == op["NOPimplied"])   {  if (TRACE == 1) traceprint("NOP");
-                                        pc++
-                                      }  # advance pc to next instraction
+                                                pc++
+                                             }  # advance pc to next instraction
         else if (code == op["ADCabsolute"]) { if (TRACE == 1) traceprint("ADCabsolute") 
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = acc + mem[absaddr] + flagC
@@ -113,6 +113,8 @@ function interpreter() {
                                               setStatusRegister()
                                               pc += 3
                                             }
+        else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
+                                             pc= -1 }
         else                          { pc = -1 }  # halt if invalid
     }
 }
@@ -143,6 +145,6 @@ function setaddressingmodetbl () {
 }
 
 function addrmode(op, addr) {
-    if (op == "NOP") return "implied"
+    if (op == "NOP" || op == "BRK") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
