@@ -6,7 +6,7 @@ BEGIN {
     ARGV[1] = ""  # remaining files are data
     TRACE = 1     # 1:trace print registers 0:not print
     tempfile = "asm6502.temp"
-    flagB = flagI = 1
+    flagB = 1
     setStatusRegister()
     setopcodetbl()
     setaddressingmodetbl()
@@ -25,11 +25,11 @@ function setopcodetbl() {
     op["BRKimplied"] = 0      # 0x00
     op["BVC"] = 80     # 0x50
     op["BVS"] = 112    # 0x70
-    op["CLC"] = 24     # 0x18
-    op["CLD"] = 216    # 0xD8
-    op["CLI"] = 88     # 0x58
-    op["CLV"] = 184    # 0xB8
-    op["DEX"] = 202    # 0xCA
+    op["CLCimplied"] = 24     # 0x18
+    op["CLDimplied"] = 216    # 0xD8
+    op["CLIimplied"] = 88     # 0x58
+    op["CLVimplied"] = 184    # 0xB8
+    op["DEXimplied"] = 202    # 0xCA
     op["DEY"] = 136    # 0x88
     op["INX"] = 232    # 0xE8
     op["INY"] = 200    # 0xC8
@@ -113,6 +113,34 @@ function interpreter() {
                                               setStatusRegister()
                                               pc += 3
                                             }
+        else if (code == op["CLCimplied"]) { if (TRACE == 1) traceprint("CLC")
+                                             flagC = 0
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["CLDimplied"]) { if (TRACE == 1) traceprint("CLD")
+                                             flagD = 0
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["CLIimplied"]) { if (TRACE == 1) traceprint("CLI")
+                                             flagI = 0
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["CLVimplied"]) { if (TRACE == 1) traceprint("CLV")
+                                             flagV = 0
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["DEXimplied"]) { if (TRACE == 1) traceprint("DEX")
+                                             if (registerX == 0) { registerX = 255;
+                                                                   flagN = 1; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             else { registerX-- }
+                                             if (registerX == 0) { flagN = 0; flagZ = 1;
+                                                                   setStatusRegister()}
+                                             if (registerX >= 128) { flagN = 1; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             if (registerX < 128) { flagN = 0; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             pc++}
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
         else                          { pc = -1 }  # halt if invalid
@@ -120,7 +148,7 @@ function interpreter() {
 }
 
 function traceprint(mnemonic) {
-    printf ( "pc=%X mnemonic=%s opcode=%X acc=%X\n", pc, mnemonic, code, acc)
+    printf ( "pc=%X mnemonic=%s opcode=%X acc=%X X=%2X\n", pc, mnemonic, code, acc, registerX)
 }
 
 function setStatusRegister (){
@@ -146,6 +174,11 @@ function setaddressingmodetbl () {
 
 function addrmode(op, addr) {
     if (op == "NOP" || 
-        op == "BRK") return "implied"
+        op == "BRK" ||
+        op == "CLC" ||
+        op == "CLD" ||
+        op == "CLI" ||
+        op == "CLV" ||
+        op == "DEX") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
