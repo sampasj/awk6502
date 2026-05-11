@@ -30,8 +30,8 @@ function setopcodetbl() {
     op["CLIimplied"] = 88     # 0x58
     op["CLVimplied"] = 184    # 0xB8
     op["DEXimplied"] = 202    # 0xCA
-    op["DEY"] = 136    # 0x88
-    op["INX"] = 232    # 0xE8
+    op["DEYimplied"] = 136    # 0x88
+    op["INXimplied"] = 232    # 0xE8
     op["INY"] = 200    # 0xC8
     op["JSR"] = 32     # 0x20
     op["NOPimplied"] = 234    # 0xEA
@@ -141,6 +141,28 @@ function interpreter() {
                                              if (registerX < 128) { flagN = 0; flagZ = 0;
                                                                    setStatusRegister()}
                                              pc++}
+        else if (code == op["DEYimplied"]) { if (TRACE == 1) traceprint("DEY")
+                                             if (registerY == 0) { registerY = 255;
+                                                                   flagN = 1; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             else { registerY-- }
+                                             if (registerY == 0) { flagN = 0; flagZ = 1;
+                                                                   setStatusRegister()}
+                                             if (registerY >= 128) { flagN = 1; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             if (registerY < 128) { flagN = 0; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             pc++}
+        else if (code == op["INXimplied"]) { if (TRACE == 1) traceprint("INX")
+                                             registerX++
+                                             if (registerX == 256) { registerX = 0; 
+                                                                   flagN = 0; flagZ = 1;
+                                                                   setStatusRegister()}
+                                             else if (registerX >= 128) { flagN = 1; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             else if (registerX < 128) { flagN = 0; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             pc++}
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
         else                          { pc = -1 }  # halt if invalid
@@ -148,7 +170,7 @@ function interpreter() {
 }
 
 function traceprint(mnemonic) {
-    printf ( "pc=%X mnemonic=%s opcode=%X acc=%X X=%2X\n", pc, mnemonic, code, acc, registerX)
+    printf ( "pc=%X mnemonic=%s opcode=%X acc=%X X=%X Y=%X\n", pc, mnemonic, code, acc, registerX, registerY)
 }
 
 function setStatusRegister (){
@@ -179,6 +201,8 @@ function addrmode(op, addr) {
         op == "CLD" ||
         op == "CLI" ||
         op == "CLV" ||
-        op == "DEX") return "implied"
+        op == "DEX" ||
+        op == "DEY" ||
+        op == "INX") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
