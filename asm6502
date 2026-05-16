@@ -32,7 +32,7 @@ function setopcodetbl() {
     op["DEXimplied"] = 202    # 0xCA
     op["DEYimplied"] = 136    # 0x88
     op["INXimplied"] = 232    # 0xE8
-    op["INY"] = 200    # 0xC8
+    op["INYimplied"] = 200    # 0xC8
     op["JSR"] = 32     # 0x20
     op["NOPimplied"] = 234    # 0xEA
     op["PHA"] = 72     # 0x48
@@ -163,6 +163,16 @@ function interpreter() {
                                              else if (registerX < 128) { flagN = 0; flagZ = 0;
                                                                    setStatusRegister()}
                                              pc++}
+        else if (code == op["INYimplied"]) { if (TRACE == 1) traceprint("INY")
+                                             registerY++
+                                             if (registerY == 256) { registerY = 0; 
+                                                                   flagN = 0; flagZ = 1;
+                                                                   setStatusRegister()}
+                                             else if (registerY >= 128) { flagN = 1; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             else if (registerY < 128) { flagN = 0; flagZ = 0;
+                                                                   setStatusRegister()}
+                                             pc++}
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
         else                          { pc = -1 }  # halt if invalid
@@ -203,6 +213,7 @@ function addrmode(op, addr) {
         op == "CLV" ||
         op == "DEX" ||
         op == "DEY" ||
-        op == "INX") return "implied"
+        op == "INX" ||
+        op == "INY") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
