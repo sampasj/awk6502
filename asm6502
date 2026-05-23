@@ -90,7 +90,7 @@ function assemblerpass2() {
             # print nextmem, " mem=",mem[nextmem],"  ", $1, $3,op[$1 $3]
             if ($3 == "absolute"){
                 mem[nextmem + 1] = $2 % 256
-                mem[nextmem + 2] = $2 / 256
+                mem[nextmem + 2] = int ($2 / 256)
             }
             nextmem += usebyte[$3]
         }
@@ -106,6 +106,7 @@ function interpreter() {
         else if (code == op["ADCabsolute"]) { if (TRACE == 1) traceprint("ADCabsolute") 
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = acc + mem[absaddr] + flagC
+                                              # print "pc=", pc, " absaddr=", absaddr, "mempc1=", mem[pc + 1], "mempc2=", mem[pc + 2]
                                               if ( acc >= 256 ) flagC = 1
                                               if ( acc == 256 ) flagZ = 1    # acc=1 0000 0000
                                               acc %= 256
