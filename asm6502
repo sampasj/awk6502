@@ -7,6 +7,7 @@ BEGIN {
     TRACE = 1     # 1:trace print registers 0:not print
     tempfile = "asm6502.temp"
     flagB = 1
+    stackPointer = 255     # 0xFF
     setStatusRegister()
     setopcodetbl()
     setaddressingmodetbl()
@@ -175,7 +176,9 @@ function interpreter() {
                                                                    setStatusRegister()}
                                              pc++}
         else if (code == op["PHAimplied"]) { if (TRACE == 1) traceprint("PHA")
-                                             
+                                             mem[256 + stackPointer] = acc
+                                             print mem[511], mem[510], mem[509]
+                                             stackPointer--
                                              pc++}
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
