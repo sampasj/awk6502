@@ -35,7 +35,7 @@ function setopcodetbl() {
     op["INYimplied"] = 200    # 0xC8
     op["JSR"] = 32     # 0x20
     op["NOPimplied"] = 234    # 0xEA
-    op["PHA"] = 72     # 0x48
+    op["PHAimplied"] = 72     # 0x48
     op["PHP"] = 8      # 0x08
     op["PLA"] = 104    # 0x68
     op["PLP"] = 40     # 0x28
@@ -81,7 +81,7 @@ function assemblerpass1() {
 }
 
 function assemblerpass2() {
-        FS = "\t"   # tabs as separator
+        FS = "\t"   # tab as separator
         nextmem = org
         while (getline <tempfile > 0) {
             if ($2 !~ /^[$]*[0-9A-F]*$/)  # if symbolic addr,
@@ -173,6 +173,9 @@ function interpreter() {
                                              else if (registerY < 128) { flagN = 0; flagZ = 0;
                                                                    setStatusRegister()}
                                              pc++}
+        else if (code == op["PHAimplied"]) { if (TRACE == 1) traceprint("PHA")
+                                             
+                                             pc++}
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
         else                          { pc = -1 }  # halt if invalid
@@ -214,6 +217,7 @@ function addrmode(op, addr) {
         op == "DEX" ||
         op == "DEY" ||
         op == "INX" ||
-        op == "INY") return "implied"
+        op == "INY" ||
+        op == "PHA") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
