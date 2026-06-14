@@ -37,7 +37,7 @@ function setopcodetbl() {
     op["JSR"] = 32     # 0x20
     op["NOPimplied"] = 234    # 0xEA
     op["PHAimplied"] = 72     # 0x48
-    op["PHP"] = 8      # 0x08
+    op["PHPimplied"] = 8      # 0x08
     op["PLA"] = 104    # 0x68
     op["PLP"] = 40     # 0x28
     op["RTI"] = 64     # 0x40
@@ -180,6 +180,11 @@ function interpreter() {
                                              print mem[511], mem[510], mem[509]
                                              stackPointer--
                                              pc++}
+        else if (code == op["PHPimplied"]) { if (TRACE == 1) traceprint("PHP")
+                                             mem[256 + stackPointer] = statusRegister
+                                             print mem[511], mem[510], mem[509]
+                                             stackPointer--
+                                             pc++}
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
         else                          { pc = -1 }  # halt if invalid
@@ -222,6 +227,7 @@ function addrmode(op, addr) {
         op == "DEY" ||
         op == "INX" ||
         op == "INY" ||
-        op == "PHA") return "implied"
+        op == "PHA" ||
+        op == "PHP") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
