@@ -4,7 +4,7 @@
      ADC $0404
      PHA
      ADC $0400
-     INX
+     PHP
      INY
      INY
      PHA
