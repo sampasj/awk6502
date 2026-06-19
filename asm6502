@@ -38,11 +38,11 @@ function setopcodetbl() {
     op["NOPimplied"] = 234    # 0xEA
     op["PHAimplied"] = 72     # 0x48
     op["PHPimplied"] = 8      # 0x08
-    op["PLA"] = 104    # 0x68
-    op["PLP"] = 40     # 0x28
+    op["PLAimplied"] = 104    # 0x68
+    op["PLPimplied"] = 40     # 0x28
     op["RTI"] = 64     # 0x40
     op["RTS"] = 96     # 0x60
-    op["SEC"] = 56     # 0x38
+    op["SECimplied"] = 56     # 0x38
     op["SED"] = 248    # 0xF8
     op["SEI"] = 120    # 0x78
     op["TAX"] = 170    # 0xAA
@@ -179,11 +179,27 @@ function interpreter() {
                                              mem[256 + stackPointer] = acc
                                              print mem[511], mem[510], mem[509]
                                              stackPointer--
+                                             if (stackPointer < 0) stackPointer = 255
                                              pc++}
         else if (code == op["PHPimplied"]) { if (TRACE == 1) traceprint("PHP")
                                              mem[256 + stackPointer] = statusRegister
                                              print mem[511], mem[510], mem[509]
                                              stackPointer--
+                                             if (stackPointer < 0) stackPointer = 255
+                                             pc++}
+        else if (code == op["PLAimplied"]) { if (TRACE == 1) traceprint("PLA")
+                                             stackPointer++
+                                             if (stackPointer > 255) stackPointer = 0
+                                             acc = mem[256 + stackPointer]
+                                             pc++}
+        else if (code == op["PLPimplied"]) { if (TRACE == 1) traceprint("PLP")
+                                             stackPointer++
+                                             if (stackPointer > 255) stackPointer = 0
+                                             statusRegister = mem[256 + stackPointer]
+                                             pc++}
+        else if (code == op["SECimplied"]) { if (TRACE == 1) traceprint("SEC")
+                                             flagC = 1
+                                             setStatusRegister()
                                              pc++}
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
@@ -192,7 +208,7 @@ function interpreter() {
 }
 
 function traceprint(mnemonic) {
-    printf ( "pc=%X mnemonic=%s opcode=%X acc=%X X=%X Y=%X\n", pc, mnemonic, code, acc, registerX, registerY)
+    printf ( "pc=%X mnemonic=%s opcode=%X acc=%X X=%X Y=%X sp=%X p=%X\n", pc, mnemonic, code, acc, registerX, registerY, stackPointer, statusRegister)
 }
 
 function setStatusRegister (){
@@ -228,6 +244,9 @@ function addrmode(op, addr) {
         op == "INX" ||
         op == "INY" ||
         op == "PHA" ||
-        op == "PHP") return "implied"
+        op == "PHP" ||
+        op == "PLA" ||
+        op == "PLP" ||
+        op == "SEC") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }

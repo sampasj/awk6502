@@ -4,13 +4,13 @@
      ADC $0404
      PHA
      ADC $0400
-     PHP
-     INY
-     INY
      PHA
-     NOP
-     NOP
-     NOP
+     ADC $0404
+     PLA
+     PLA
+     PHP
+     SEC
+     PLP
      NOP
      NOP
      NOP
