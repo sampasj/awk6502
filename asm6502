@@ -43,9 +43,9 @@ function setopcodetbl() {
     op["RTI"] = 64     # 0x40
     op["RTS"] = 96     # 0x60
     op["SECimplied"] = 56     # 0x38
-    op["SED"] = 248    # 0xF8
-    op["SEI"] = 120    # 0x78
-    op["TAX"] = 170    # 0xAA
+    op["SEDimplied"] = 248    # 0xF8
+    op["SEIimplied"] = 120    # 0x78
+    op["TAXimplied"] = 170    # 0xAA
     op["TAY"] = 168    # 0xA8
     op["TSX"] = 186    # 0xBA
     op["TXA"] = 138    # 0x8A
@@ -193,6 +193,7 @@ function interpreter() {
                                              acc = mem[256 + stackPointer]
                                              pc++}
         else if (code == op["PLPimplied"]) { if (TRACE == 1) traceprint("PLP")
+        # PをPullしたら各flagに反映が必要
                                              stackPointer++
                                              if (stackPointer > 255) stackPointer = 0
                                              statusRegister = mem[256 + stackPointer]
@@ -201,6 +202,19 @@ function interpreter() {
                                              flagC = 1
                                              setStatusRegister()
                                              pc++}
+        else if (code == op["SEDimplied"]) { if (TRACE == 1) traceprint("SED")
+                                             flagD = 1
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["SEIimplied"]) { if (TRACE == 1) traceprint("SEI")
+                                             flagI = 1
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["TAXimplied"]) { if (TRACE == 1) traceprint("TAX")
+                                             registerX = acc
+                                             # flag set
+                                             setStatusRegister()
+                                             pc++}                                                                                                                            
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
         else                          { pc = -1 }  # halt if invalid
@@ -247,6 +261,9 @@ function addrmode(op, addr) {
         op == "PHP" ||
         op == "PLA" ||
         op == "PLP" ||
-        op == "SEC") return "implied"
+        op == "SEC" ||
+        op == "SED" ||
+        op == "SEI" ||
+        op == "TAX") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }

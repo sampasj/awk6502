@@ -7,10 +7,11 @@
      PHA
      ADC $0404
      PLA
+     TAX
      PLA
      PHP
      SEC
      PLP
-     NOP
+     SED
      NOP
      NOP
