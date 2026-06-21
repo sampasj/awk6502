@@ -1,5 +1,22 @@
 # asm6502 - assembler and interpreter for MOS 6502 computer
 #   usage: awk -f asm6502 program-file data-file...
+#
+# Register variables
+# acc: accumurator, A register
+# registerX: index register X
+# registerY: index register Y
+# stackPointer: stack pointer 8 bit
+# pc: program counter
+# statusRegister: status register
+#
+# flags
+# flagN: negative flag
+# flagV: overflow flag
+# flagB: break flag
+# flagD: decimal mode flag
+# flagI: interapt flag
+# flagZ: zero flag
+# flagC: carry flag
 
 BEGIN {
     srcfile = ARGV[1]
@@ -46,10 +63,10 @@ function setopcodetbl() {
     op["SEDimplied"] = 248    # 0xF8
     op["SEIimplied"] = 120    # 0x78
     op["TAXimplied"] = 170    # 0xAA
-    op["TAY"] = 168    # 0xA8
-    op["TSX"] = 186    # 0xBA
-    op["TXA"] = 138    # 0x8A
-    op["TXS"] = 154    # 0x9A
+    op["TAYimplied"] = 168    # 0xA8
+    op["TSXimplied"] = 186    # 0xBA
+    op["TXAimplied"] = 138    # 0x8A
+    op["TXSimplied"] = 154    # 0x9A
     op["TYA"] = 152    # 0x98
     op["ADCabsolute"] = 109   # 0x6D
     op["ADCzeropage"] = 101   # 0x65
@@ -212,9 +229,34 @@ function interpreter() {
                                              pc++}
         else if (code == op["TAXimplied"]) { if (TRACE == 1) traceprint("TAX")
                                              registerX = acc
-                                             # flag set
+                                             if (acc == 0){flagZ = 1}else{flagZ = 0}
+                                             if (acc >= 128){flagN = 1}else{flagN = 0}
                                              setStatusRegister()
-                                             pc++}                                                                                                                            
+                                             pc++}
+        else if (code == op["TAYimplied"]) { if (TRACE == 1) traceprint("TAY")
+                                             registerY = acc
+                                             if (acc == 0){flagZ = 1}else{flagZ = 0}
+                                             if (acc >= 128){flagN = 1}else{flagN = 0}
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["TSXimplied"]) { if (TRACE == 1) traceprint("TSX")
+                                             registerX = stackPointer
+                                             if (registerX == 0){flagZ = 1}else{flagZ = 0}
+                                             if (registerX >= 128){flagN = 1}else{flagN = 0}
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["TXAimplied"]) { if (TRACE == 1) traceprint("TXA")
+                                             acc = registerX
+                                             if (acc == 0){flagZ = 1}else{flagZ = 0}
+                                             if (acc >= 128){flagN = 1}else{flagN = 0}
+                                             setStatusRegister()
+                                             pc++}
+        else if (code == op["TXSimplied"]) { if (TRACE == 1) traceprint("TXS")
+                                             stackPointer = registerX
+                                             if (registerX == 0){flagZ = 1}else{flagZ = 0}
+                                             if (registerX >= 128){flagN = 1}else{flagN = 0}
+                                             setStatusRegister()
+                                             pc++}                                                                                                                                                                                                                                                                                       
         else if (code == op["BRKimplied"]) { if (TRACE == 1) traceprint("BRK") 
                                              pc= -1 }
         else                          { pc = -1 }  # halt if invalid
@@ -264,6 +306,10 @@ function addrmode(op, addr) {
         op == "SEC" ||
         op == "SED" ||
         op == "SEI" ||
-        op == "TAX") return "implied"
+        op == "TAX" ||
+        op == "TAY" ||
+        op == "TSX" ||
+        op == "TXA" ||
+        op == "TXS") return "implied"
     else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
 }
