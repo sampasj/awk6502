@@ -1,6 +1,6 @@
      .ORG    $400
      NOP     ; No OPeration
-     NOP
+     LDA #$11
      ADC $0404
      TAX
      PHA
@@ -17,5 +17,6 @@
      PLP
      TSX
      TXA
+     TYA
      NOP
      NOP
