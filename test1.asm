@@ -1,6 +1,7 @@
      .ORG    $400
      NOP     ; No OPeration
      LDA #$11
+     LDA $A1
      ADC $0404
      TAX
      PHA
