@@ -1,8 +1,9 @@
      .ORG    $400
      NOP     ; No OPeration
      LDA #$11
+     TAX
      LDA $A1
-     ADC $0404
+     LDA $A1,X
      TAX
      PHA
      ADC $0400
@@ -12,12 +13,6 @@
      PLA
      TAX
      TAY
-     PLA
-     PHP
-     SEC
-     PLP
-     TSX
-     TXA
      TYA
      NOP
      NOP
