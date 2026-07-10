@@ -3,7 +3,8 @@
      LDA #$11
      TAX
      LDA $A1
-     LDA $A1,X
+     LDA ($A1,X)
+     LDA $0400,Y
      TAX
      PHA
      ADC $0400
