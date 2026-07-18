@@ -226,7 +226,7 @@ function interpreter() {
                                             }
         else if (code == op["LDAindexedX"]) { if (TRACE == 1) traceprint("LDAindexedX")
                                               iaddr = mem[pc + 1] + registerX
-                                              acc = mem[iaddr]
+                                              acc = mem[mem[iaddr] + mem[iaddr + 1]*256]
                                               if (acc == ""){acc = 0}
                                               print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
