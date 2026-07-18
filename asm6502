@@ -82,7 +82,7 @@ function setopcodetbl() {
     op["LDAabsolute"] = 173   # 0xAD
     op["LDAabsoluteX"] = 189  # 0xBD
     op["LDAabsoluteY"] = 185  # 0xB9
-    op["LDAindirectX"] = 161  # 0xA1
+    op["LDAindexedX"] = 161   # 0xA1
     op["LDAindirectY"] = 177  # 0xB1
 }
 
@@ -128,7 +128,7 @@ function assemblerpass1() {
                    sub(/\$/, "0x", $3);
                    $3 = strtonum($3)
            }
-           else if (mode == "indirectX"){
+           else if (mode == "indexedX"){
                    sub(/,X\)$/,"",$3)
                    sub(/\(\$/, "0x", $3);
                    $3 = strtonum($3)
@@ -159,7 +159,7 @@ function assemblerpass2() {
             }
             else if ($3 == "zeropage" ||
                      $3 == "zeropageX" ||
-                     $3 == "indirectX"){
+                     $3 == "indexedX"){
                 mem[nextmem + 1] = $2
             }
             nextmem += usebyte[$3]
@@ -182,6 +182,7 @@ function interpreter() {
                                             }
         else if (code == op["LDAzeropage"]) { if (TRACE == 1) traceprint("LDAzeropage")
                                               acc = mem[mem[pc + 1]]
+                                              if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
@@ -190,6 +191,7 @@ function interpreter() {
         else if (code == op["LDAzeropageX"]) { if (TRACE == 1) traceprint("LDAzeropageX")
                                               idxAddr =  ( mem[pc + 1] + registerX ) % 256
                                               acc = mem[idxAddr]
+                                              if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
@@ -198,6 +200,7 @@ function interpreter() {
         else if (code == op["LDAabsolute"]) { if (TRACE == 1) traceprint("LDAabsolute")
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = mem[absaddr]
+                                              if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
@@ -206,6 +209,7 @@ function interpreter() {
         else if (code == op["LDAabsoluteX"]) { if (TRACE == 1) traceprint("LDAabsoluteX")
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = mem[absaddr + registerX]
+                                              if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
@@ -214,14 +218,17 @@ function interpreter() {
         else if (code == op["LDAabsoluteY"]) { if (TRACE == 1) traceprint("LDAabsoluteY")
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = mem[absaddr + registerY]
+                                              if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 3
                                             }
-        else if (code == op["indirectX"]) { if (TRACE == 1) traceprint("indirectX")
+        else if (code == op["LDAindexedX"]) { if (TRACE == 1) traceprint("LDAindexedX")
                                               iaddr = mem[pc + 1] + registerX
                                               acc = mem[iaddr]
+                                              if (acc == ""){acc = 0}
+                                              print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
@@ -428,5 +435,5 @@ function addrmode(op, addr) {
     else if (op == "LDA" && addr ~ /^\$....$/) return "absolute"
     else if (op == "LDA" && addr ~ /^\$....,X$/) return "absoluteX"
     else if (op == "LDA" && addr ~ /^\$....,Y$/) return "absoluteY"
-    else if (op == "LDA" && addr ~ /^\(\$..,X\)$/) return "indirectX"
+    else if (op == "LDA" && addr ~ /^\(\$..,X\)$/) return "indexedX"
 }
