@@ -2,7 +2,7 @@
      NOP     ; No OPeration
      LDA #$11
      TAX
-     LDA $A1
+     LDA ($A1),Y
      LDA ($A1,X)
      LDA $0400,Y
      TAX

@@ -133,6 +133,11 @@ function assemblerpass1() {
                    sub(/\(\$/, "0x", $3);
                    $3 = strtonum($3)
            }
+           else if (mode == "indirectY"){
+                   sub(/\),Y$/,"",$3)
+                   sub(/\(\$/, "0x", $3);
+                   $3 = strtonum($3)
+           }
            print $2 "\t" $3 "\t" mode >tempfile
            nextmem += usebytes[mode]
         }
@@ -159,7 +164,8 @@ function assemblerpass2() {
             }
             else if ($3 == "zeropage" ||
                      $3 == "zeropageX" ||
-                     $3 == "indexedX"){
+                     $3 == "indexedX" ||
+                     $3 == "indirectY"){
                 mem[nextmem + 1] = $2
             }
             nextmem += usebyte[$3]
@@ -233,7 +239,17 @@ function interpreter() {
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 2
-                                            }                                                                        
+                                            }   
+        else if (code == op["LDAindirectY"]) { if (TRACE == 1) traceprint("LDAindirectY")
+                                              iaddr = mem[pc + 1]
+                                              acc = mem[mem[iaddr] + mem[iaddr + 1]*256 + registerY]
+                                              if (acc == ""){acc = 0}
+                                              print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
+                                              if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
+                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 2
+                                            }                                                                     
         else if (code == op["ADCabsolute"]) { if (TRACE == 1) traceprint("ADCabsolute") 
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = acc + mem[absaddr] + flagC
@@ -436,4 +452,5 @@ function addrmode(op, addr) {
     else if (op == "LDA" && addr ~ /^\$....,X$/) return "absoluteX"
     else if (op == "LDA" && addr ~ /^\$....,Y$/) return "absoluteY"
     else if (op == "LDA" && addr ~ /^\(\$..,X\)$/) return "indexedX"
+    else if (op == "LDA" && addr ~ /^\(\$..\),Y$/) return "indirectY"
 }
