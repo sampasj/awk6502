@@ -234,7 +234,7 @@ function interpreter() {
                                               iaddr = mem[pc + 1] + registerX
                                               acc = mem[mem[iaddr] + mem[iaddr + 1]*256]
                                               if (acc == ""){acc = 0}
-                                              print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
+                                              # print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
@@ -244,7 +244,7 @@ function interpreter() {
                                               iaddr = mem[pc + 1]
                                               acc = mem[mem[iaddr] + mem[iaddr + 1]*256 + registerY]
                                               if (acc == ""){acc = 0}
-                                              print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
+                                              # print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
                                               if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
@@ -444,13 +444,12 @@ function addrmode(op, addr) {
         op == "TXA" ||
         op == "TXS" ||
         op == "TYA") return "implied"
-    else if (op == "ADC" && addr ~ /^\$....$/) return "absolute"
-    else if (op == "LDA" && addr ~ /^#/) return "immediate"
-    else if (op == "LDA" && addr ~ /^\$..$/) return "zeropage"
-    else if (op == "LDA" && addr ~ /^\$..,X$/) return "zeropageX"
-    else if (op == "LDA" && addr ~ /^\$....$/) return "absolute"
-    else if (op == "LDA" && addr ~ /^\$....,X$/) return "absoluteX"
-    else if (op == "LDA" && addr ~ /^\$....,Y$/) return "absoluteY"
-    else if (op == "LDA" && addr ~ /^\(\$..,X\)$/) return "indexedX"
-    else if (op == "LDA" && addr ~ /^\(\$..\),Y$/) return "indirectY"
+    else if (addr ~ /^#/) return "immediate"
+    else if (addr ~ /^\$..$/) return "zeropage"
+    else if (addr ~ /^\$..,X$/) return "zeropageX"
+    else if (addr ~ /^\$....$/) return "absolute"
+    else if (addr ~ /^\$....,X$/) return "absoluteX"
+    else if (addr ~ /^\$....,Y$/) return "absoluteY"
+    else if (addr ~ /^\(\$..,X\)$/) return "indexedX"
+    else if (addr ~ /^\(\$..\),Y$/) return "indirectY"
 }
