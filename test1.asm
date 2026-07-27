@@ -12,8 +12,7 @@
      LDA ($A1,X)
      LDA $0400,Y
      TAX
-     PHA
+     PHP
+     SEC
+     PLP
      TXS
-     PHA
-     ADC $0404
-     PLA

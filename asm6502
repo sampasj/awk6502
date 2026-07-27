@@ -422,10 +422,10 @@ function interpreter() {
                                              acc = mem[256 + stackPointer]
                                              pc++}
         else if (code == op["PLPimplied"]) { if (TRACE == 1) traceprint("PLP")
-        # PをPullしたら各flagに反映が必要
                                              stackPointer++
                                              if (stackPointer > 255) stackPointer = 0
                                              statusRegister = mem[256 + stackPointer]
+                                             setEachFlag(statusRegister)
                                              pc++}
         else if (code == op["SECimplied"]) { if (TRACE == 1) traceprint("SEC")
                                              flagC = 1
@@ -485,6 +485,16 @@ function traceprint(mnemonic) {
 function setStatusRegister (){
     statusRegister = 128 * flagN + 64 * flagV + 32 + 16 * flagB + 8 * flagD + 4 * flagI + 2 * flagZ + flagC
     if (TRACE == 1) printf ("statusRegister=%X\n", statusRegister )
+}
+
+function setEachFlag(reg) {
+    flagC = (and(reg, 1) ? 1:0 )
+    flagZ = (and(reg, 2) ? 1:0 )
+    flagI = (and(reg, 4) ? 1:0 )
+    flagD = (and(reg, 8) ? 1:0 )
+    flagB = (and(reg, 16) ? 1:0 )
+    flagV = (and(reg, 64) ? 1:0 )
+    flagN = (and(reg, 128) ? 1:0 )
 }
 
 function setaddressingmodetbl () {
