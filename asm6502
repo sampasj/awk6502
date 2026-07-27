@@ -73,7 +73,7 @@ function setopcodetbl() {
     op["ADCimmediate"] = 105  # 0x69
     op["ADCabsoluteX"] = 125  # 0x7D
     op["ADCabsoluteY"] = 121  # 0x79
-    op["ADCindirectX"] = 97   # 0x61
+    op["ADCindexedX"] = 97    # 0x61
     op["ADCindirectY"] = 113  # 0x71
     op["ADCzeropageX"] = 117  # 0x75
     op["LDAimmediate"] = 169  # 0xA9
@@ -84,6 +84,13 @@ function setopcodetbl() {
     op["LDAabsoluteY"] = 185  # 0xB9
     op["LDAindexedX"] = 161   # 0xA1
     op["LDAindirectY"] = 177  # 0xB1
+    op["STAzeropage"] = 133   # 0x85
+    op["STAzeropageX"] = 149  # 0x95
+    op["STAabsolute"] = 141   # 0x8D
+    op["STAabsoluteX"] = 157  # 0x9D
+    op["STAabsoluteY"] = 153  # 0x99
+    op["STAindexedX"] = 129   # 0x81
+    op["STAindirectY"] = 145  # 0x91
 }
 
 function assemblerpass1() {
@@ -182,7 +189,7 @@ function interpreter() {
         else if (code == op["LDAimmediate"]) { if (TRACE == 1) traceprint("LDAimmediate") 
                                               acc = mem[pc + 1]
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 2
                                             }
@@ -190,7 +197,7 @@ function interpreter() {
                                               acc = mem[mem[pc + 1]]
                                               if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 2
                                             }
@@ -199,7 +206,7 @@ function interpreter() {
                                               acc = mem[idxAddr]
                                               if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 2
                                             }
@@ -208,7 +215,7 @@ function interpreter() {
                                               acc = mem[absaddr]
                                               if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 3
                                             }
@@ -217,7 +224,7 @@ function interpreter() {
                                               acc = mem[absaddr + registerX]
                                               if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 3
                                             }
@@ -226,7 +233,7 @@ function interpreter() {
                                               acc = mem[absaddr + registerY]
                                               if (acc == ""){acc = 0}
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 3
                                             }
@@ -236,7 +243,7 @@ function interpreter() {
                                               if (acc == ""){acc = 0}
                                               # print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 2
                                             }   
@@ -246,7 +253,7 @@ function interpreter() {
                                               if (acc == ""){acc = 0}
                                               # print "pc=",pc, "mem=",mem[pc + 1],"iaddr=",iaddr, "acc=",acc
                                               if ( acc == 0 ) {flagZ = 1} else {flagZ = 0}
-                                              if ( acc >= 128 ) {flagN = flsgV = 1}  else {flagN = flsgV = 0} # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = 1}  else {flagN = 0} # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 2
                                             }                                                                     
@@ -254,12 +261,88 @@ function interpreter() {
                                               absaddr = mem[pc + 1] + mem[pc + 2] * 256
                                               acc = acc + mem[absaddr] + flagC
                                               # print "pc=", pc, " absaddr=", absaddr, "mempc1=", mem[pc + 1], "mempc2=", mem[pc + 2]
-                                              if ( acc >= 256 ) flagC = 1
-                                              if ( acc == 256 ) flagZ = 1    # acc=1 0000 0000
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
                                               acc %= 256
-                                              if ( acc >= 128 ) flagN = flsgV = 1   # acc=1... .... sc. MSB=1
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
                                               setStatusRegister()
                                               pc += 3
+                                            }
+        else if (code == op["ADCzeropage"]) { if (TRACE == 1) traceprint("ADCzeropage") 
+                                              zeroaddr = mem[pc + 1]
+                                              acc = acc + mem[zeroaddr] + flagC
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
+                                              acc %= 256
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 2
+                                            }
+        else if (code == op["ADCimmediate"]) { if (TRACE == 1) traceprint("ADCimmediate") 
+                                              acc = acc + mem[pc + 1] + flagC
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
+                                              acc %= 256
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 2
+                                            }
+        else if (code == op["ADCabsoluteX"]) { if (TRACE == 1) traceprint("ADCabsoluteX") 
+                                              absaddr = mem[pc + 1] + mem[pc + 2] * 256 + registerX
+                                              acc = acc + mem[absaddr] + flagC
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
+                                              acc %= 256
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 3
+                                            }
+        else if (code == op["ADCabsoluteY"]) { if (TRACE == 1) traceprint("ADCabsoluteY") 
+                                              absaddr = mem[pc + 1] + mem[pc + 2] * 256 + registerY
+                                              acc = acc + mem[absaddr] + flagC
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
+                                              acc %= 256
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 3
+                                            }
+        else if (code == op["ADCindexedX"]) { if (TRACE == 1) traceprint("ADCindexedX") 
+                                              iaddr = mem[pc + 1] + registerX
+                                              acc = acc + mem[mem[iaddr] + mem[iaddr + 1] * 256] + flagC
+                                              if (acc == ""){acc = 0}
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
+                                              acc %= 256
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 2
+                                            }
+        else if (code == op["ADCindirectY"]) { if (TRACE == 1) traceprint("ADCindirectY") 
+                                              iaddr = mem[pc + 1]
+                                              acc = acc + mem[mem[iaddr] + mem[iaddr + 1] * 256 + registerY] + flagC
+                                              if (acc == ""){acc = 0}
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
+                                              acc %= 256
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 2
+                                            }
+        else if (code == op["ADCzeropageX"]) { if (TRACE == 1) traceprint("ADCzeropageX")
+                                              idxAddr =  ( mem[pc + 1] + registerX ) % 256
+                                              acc = acc + mem[idxAddr] + flagC
+                                              if (acc == ""){acc = 0}
+                                              if ( acc >= 256 ) {flagC = 1} else {flagC = 0}
+                                              if ( acc == 256 ) {flagZ = 1} else {flagZ = 0}   # acc=1 0000 0000
+                                              acc %= 256
+                                              if ( acc >= 128 ) {flagN = flsgV = 1} else {flagN = flagV = 0}  # acc=1... .... sc. MSB=1
+                                              setStatusRegister()
+                                              pc += 2
+                                            }
+        else if (code == op["STAzeropage"]) { if (TRACE == 1) traceprint("STAzeropage")
+                                              mem[mem[pc + 1]] = acc
+                                              pc += 2
                                             }                                    
         else if (code == op["CLCimplied"]) { if (TRACE == 1) traceprint("CLC")
                                              flagC = 0
