@@ -1,17 +1,10 @@
      .ORG    $400
      NOP     ; No OPeration
+     INX
      LDA #$11
+     STA $2F,X
      SEC
      ADC $30
-     ADC #$05
-     ADC $0400,X
-     ADC $0400,Y
-     ADC $30,X
-     TAX
-     LDA ($A1),Y
-     LDA ($A1,X)
-     LDA $0400,Y
-     TAX
      PHP
      SEC
      PLP

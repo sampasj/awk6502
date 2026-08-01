@@ -343,6 +343,10 @@ function interpreter() {
         else if (code == op["STAzeropage"]) { if (TRACE == 1) traceprint("STAzeropage")
                                               mem[mem[pc + 1]] = acc
                                               pc += 2
+                                            }
+        else if (code == op["STAzeropageX"]) { if (TRACE == 1) traceprint("STAzeropageX")
+                                              mem[mem[pc + 1] + registerX] = acc
+                                              pc += 2
                                             }                                    
         else if (code == op["CLCimplied"]) { if (TRACE == 1) traceprint("CLC")
                                              flagC = 0
@@ -488,6 +492,8 @@ function setStatusRegister (){
 }
 
 function setEachFlag(reg) {
+    # status register = NV-BDIZC
+    # The `and` function is a GNU AWK extension.
     flagC = (and(reg, 1) ? 1:0 )
     flagZ = (and(reg, 2) ? 1:0 )
     flagI = (and(reg, 4) ? 1:0 )
