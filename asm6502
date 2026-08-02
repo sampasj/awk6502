@@ -34,7 +34,7 @@ BEGIN {
 }
 
 function setopcodetbl() {
-    op["BCC"] = 144    # 0x90
+    op["BCCrelative"] = 144   # 0x90
     op["BCS"] = 176    # 0xB0
     op["BEQ"] = 240    # 0xF0
     op["BMI"] = 48     # 0x30
