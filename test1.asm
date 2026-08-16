@@ -1,9 +1,10 @@
      .ORG    $400
      NOP     ; No OPeration
      INX
-     LDA #$11
+LB1  LDA #$11
      STA $2F,X
-     SEC
+     CLC
+     BCC LB1
      ADC $30
      PHP
      SEC
