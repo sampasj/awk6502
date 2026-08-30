@@ -172,7 +172,8 @@ function assemblerpass2() {
                 mem[nextmem + 1] = $2
             }
             else if ($3 == "relative"){
-                x = $2 - nextmem + 2
+                x = $2 - (nextmem + 2)
+                print "pass2 x=", x,"$2=",$2,"nextmem=",nextmem
                 if (x >= 0 && x < 128){
                     mem[nextmem + 1] = x
                 }
@@ -363,7 +364,9 @@ function interpreter() {
                                             }
         else if (code == op["BCCrelative"]) { if (TRACE == 1) traceprint("BCCrelative")
                                               if (flagC == 0){
+                                                print "mem pc + 1=",mem[pc + 1],"getAddr=", getRelativeAddr(mem[pc + 1])
                                                 pc = pc + 2 + getRelativeAddr(mem[pc + 1])
+                                                print "BCC pc=", pc
                                               }
                                               pc += 2
                                             }                                    
