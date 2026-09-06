@@ -3,10 +3,41 @@
      INX
 LB1  LDA #$11
      STA $2F,X
-     CLC
-     BCC LB1
+     SEC
+     BCS LABEL2
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
      ADC $30
-     PHP
+LABEL2   PHP
      SEC
      PLP
      TXS

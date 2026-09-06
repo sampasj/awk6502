@@ -35,7 +35,7 @@ BEGIN {
 
 function setopcodetbl() {
     op["BCCrelative"] = 144   # 0x90
-    op["BCS"] = 176    # 0xB0
+    op["BCSrelative"] = 176   # 0xB0
     op["BEQ"] = 240    # 0xF0
     op["BMI"] = 48     # 0x30
     op["BNE"] = 208    # 0xD0
@@ -364,12 +364,15 @@ function interpreter() {
                                             }
         else if (code == op["BCCrelative"]) { if (TRACE == 1) traceprint("BCCrelative")
                                               if (flagC == 0){
-                                                print "mem pc + 1=",mem[pc + 1],"getAddr=", getRelativeAddr(mem[pc + 1])
                                                 pc = pc + 2 + getRelativeAddr(mem[pc + 1])
-                                                print "BCC pc=", pc
-                                              }
-                                              pc += 2
-                                            }                                    
+                                              } else pc += 2
+                                            }
+        else if (code == op["BCSrelative"]) { if (TRACE == 1) traceprint("BCSrelative")
+                                              if (flagC == 1){
+                                                print "pc=",pc,"mem+1",mem[pc + 1],"rel=",getRelativeAddr(mem[pc + 1])
+                                                pc = pc + 2 + getRelativeAddr(mem[pc + 1])
+                                              } else pc += 2
+                                            }                                      
         else if (code == op["CLCimplied"]) { if (TRACE == 1) traceprint("CLC")
                                              flagC = 0
                                              setStatusRegister()
@@ -571,7 +574,8 @@ function addrmode(op, addr) {
         op == "TXA" ||
         op == "TXS" ||
         op == "TYA") return "implied"
-    else if (op == "BCC") return "relative"
+    else if (op == "BCC" ||
+             op == "BCS") return "relative"
     else if (addr ~ /^#/) return "immediate"
     else if (addr ~ /^\$..$/) return "zeropage"
     else if (addr ~ /^\$..,X$/) return "zeropageX"
