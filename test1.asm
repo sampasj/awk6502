@@ -3,35 +3,8 @@
      INX
 LB1  LDA #$11
      STA $2F,X
-     SEC
-     BCS LABEL2
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
-     NOP
+     LDA #00
+     BEQ LABEL2
      NOP
      NOP
      NOP

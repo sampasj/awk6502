@@ -36,7 +36,7 @@ BEGIN {
 function setopcodetbl() {
     op["BCCrelative"] = 144   # 0x90
     op["BCSrelative"] = 176   # 0xB0
-    op["BEQ"] = 240    # 0xF0
+    op["BEQrelative"] = 240   # 0xF0
     op["BMI"] = 48     # 0x30
     op["BNE"] = 208    # 0xD0
     op["BPL"] = 16     # 0x10
@@ -369,7 +369,11 @@ function interpreter() {
                                             }
         else if (code == op["BCSrelative"]) { if (TRACE == 1) traceprint("BCSrelative")
                                               if (flagC == 1){
-                                                print "pc=",pc,"mem+1",mem[pc + 1],"rel=",getRelativeAddr(mem[pc + 1])
+                                                pc = pc + 2 + getRelativeAddr(mem[pc + 1])
+                                              } else pc += 2
+                                            }
+        else if (code == op["BEQrelative"]) { if (TRACE == 1) traceprint("BEQrelative")
+                                              if (flagZ == 1){
                                                 pc = pc + 2 + getRelativeAddr(mem[pc + 1])
                                               } else pc += 2
                                             }                                      
@@ -575,7 +579,8 @@ function addrmode(op, addr) {
         op == "TXS" ||
         op == "TYA") return "implied"
     else if (op == "BCC" ||
-             op == "BCS") return "relative"
+             op == "BCS" ||
+             op == "BEQ") return "relative"
     else if (addr ~ /^#/) return "immediate"
     else if (addr ~ /^\$..$/) return "zeropage"
     else if (addr ~ /^\$..,X$/) return "zeropageX"
