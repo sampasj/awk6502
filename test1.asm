@@ -3,8 +3,15 @@
      INX
 LB1  LDA #$11
      STA $2F,X
-     LDA #00
-     BEQ LABEL2
+     LDA #01
+     NOP
+     BNE LABEL2
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
+     NOP
      NOP
      NOP
      NOP
